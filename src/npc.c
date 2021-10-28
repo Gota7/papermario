@@ -743,7 +743,106 @@ void update_npc_blur(Npc* npc) {
     blurBuf->index = index;
 }
 
-INCLUDE_ASM(void, "npc", appendGfx_npc_blur, Npc* npc);
+//INCLUDE_ASM(void, "npc", appendGfx_npc_blur, Npc* npc);
+
+/*void appendGfx_npc_blur(Npc* npc) {
+    BlurBuffer* blurBuf;
+    s32 i;
+
+    blurBuf = npc->blurBuf;
+    s8 index = blurBuf->index;
+
+    for (i = index - 1)
+
+    func_8003D3BC(npc);
+}*/
+
+void appendGfx_npc_blur(Npc* npc) {
+    f32 sp60[4][4];
+    f32 sp20[4][4];
+    f32 temp_f20;
+    f32 temp_f20_2;
+    f32 temp_f22;
+    f32 temp_f24;
+    s32 temp_s3;
+    s32 temp_s4;
+    s32 temp_s5;
+    s32 temp_v1;
+    BlurBuffer* blurBuf;
+    BlurBuffer* temp_v0;
+    s32 phi_s2;
+    s32 phi_s2_2;
+    s32 phi_s3;
+    s32 phi_s5;
+    s32 phi_s4;
+    s8 phi_s2_3;
+
+    blurBuf = npc->blurBuf;
+    phi_s3 = 0;
+    phi_s2_3 = blurBuf->index;
+    phi_s3 = 0;
+    phi_s5 = 0;
+    phi_s4 = 0;
+outerLoop:
+    phi_s2 = phi_s2_3 - 1;
+innerLoop:
+    temp_s3 = phi_s3 + 1;
+    phi_s2_2 = phi_s2;
+    phi_s3 = temp_s3;
+    if (phi_s2 < 0) {
+        phi_s2_2 = 0x13;
+    }
+    phi_s2_3 = (s8) phi_s2_2;
+    if (phi_s2_2 != blurBuf->index) {
+        if (temp_s3 >= 3) {
+            temp_s5 = phi_s5 + 1;
+            temp_s4 = phi_s4 + 0x14;
+            phi_s5 = temp_s5;
+            phi_s4 = temp_s4;
+            phi_s5 = temp_s5;
+            phi_s4 = temp_s4;
+            if (temp_s5 < 4) {
+                temp_v0 = blurBuf + (phi_s2_2 * 4);
+                temp_f20 = temp_v0->x[0];
+                temp_f22 = temp_v0->y[0];
+                temp_f24 = temp_v0->z[0];
+                func_802DE894(npc->spriteInstanceID, 7, 0xFF, 0xFF, 0xFF, 0x78 - temp_s4, 0);
+                temp_f20_2 = npc->renderYaw;
+                guTranslateF(&sp20, temp_f20, temp_f22, temp_f24);
+                if (npc->rotation.y != 0.0f) {
+                    guRotateF(&sp60, npc->rotation.y, 0.0f, 1.0f, 0.0f);
+                    guMtxCatF(&sp60, &sp20, &sp20);
+                }
+                if (npc->rotation.x != 0.0f) {
+                    guRotateF(&sp60, npc->rotation.y, 0.0f, 1.0f, 0.0f);
+                    guMtxCatF(&sp60, &sp20, &sp20);
+                }
+                if (npc->rotation.z != 0.0f) {
+                    guRotateF(&sp60, npc->rotation.y, 0.0f, 1.0f, 0.0f);
+                    guMtxCatF(&sp60, &sp20, &sp20);
+                }
+                if ((((f64) npc->scale.x * 0.7142857142857143) != 1.0) || (((f64) (npc->scale.y * npc->verticalStretch) * 0.7142857142857143) != 1.0) || (((f64) npc->scale.z * 0.7142857142857143) != 1.0)) {
+                    guScaleF(&sp60, (f32) ((f64) npc->scale.x * 0.7142857142857143), (f32) ((f64) (npc->scale.y * npc->verticalStretch) * 0.7142857142857143), (f32) ((f64) npc->scale.z * 0.7142857142857143));
+                    guMtxCatF(&sp60, &sp20, &sp20);
+                }
+                temp_v1 = npc->flags;
+                if ((temp_v1 & 0x40000000) != 0) {
+                    spr_draw_player_sprite(0x40000001, (s32) temp_f20_2, 0, 0, &sp20);
+                    phi_s2 = phi_s2_2 - 1;
+                } else if ((temp_v1 & 0x1000000) == 0) {
+                    spr_draw_npc_sprite(npc->spriteInstanceID, (s32) temp_f20_2, 0, 0, &sp20);
+                    phi_s2 = phi_s2_2 - 1;
+                } else {
+                    goto outerLoop;
+                }
+                goto innerLoop;
+            }
+        } else {
+            goto outerLoop;
+        }
+    }
+    func_8003D3BC(npc);
+}
 
 void npc_enable_collisions(void) {
     D_800A0B94 = 1;
