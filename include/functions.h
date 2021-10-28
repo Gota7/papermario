@@ -470,9 +470,7 @@ void crash_screen_init(void);
 void crash_screen_set_draw_info(u16* frameBufPtr, s16 width, s16 height);
 
 // Dead functions:
-//Npc* dead_get_npc_safe(s32 npcId); // get_npc_safe
-void func_80077BD0(s32, s32, s32, s32, s32, s32);
-void func_8006CAC0(float mf[4][4], float x, float y, float z);
+void dead_guTranslateF(float mf[4][4], float x, float y, float z); // Has to be externed for codegen to work!
 
 void func_800495A0(Evt* script, NpcAISettings* npcAISettings, EnemyTerritoryThing* territory);
 void func_800496B8(Evt* script, NpcAISettings* npcAISettings, EnemyTerritoryThing* territory);
@@ -492,7 +490,7 @@ void sfx_get_spatialized_sound_params(f32 arg0, f32 arg1, f32 arg2, s16* arg3, s
 void sfx_play_sound_with_params(s32 arg0, u8 arg1, u8 arg2, s16 arg3);
 s32 func_8004A784(Npc* npc, f32 arg1, f32* arg2, f32* arg3, f32* arg4, f32* arg5);
 void base_UnkNpcAIFunc1(Evt* script, NpcAISettings* aiSettings, EnemyTerritoryThing* territory);
-void DeadUnkNpcAIFunc1(Evt* script, NpcAISettings* aiSettings, EnemyTerritoryThing* territory);
+void UnkNpcAIFunc1(Evt* script, NpcAISettings* aiSettings, EnemyTerritoryThing* territory);
 
 s32** spr_get_npc_palettes(s32 npcSpriteID);
 void spr_draw_player_sprite(s32 arg0, s32 arg1, s32 arg2, s32 arg3, Matrix4f arg4);
@@ -558,6 +556,16 @@ void btl_show_variable_battle_message(s32, s32, s32);
 s32 btl_is_popup_displayed(void);
 void func_8024E3D8(s32);
 s32 inflict_status(Actor*, s32, s32);
+s32 try_inflict_status(Actor*, s32, s32);
+void mdl_set_all_fog_mode(s32);
+
+void update_effects(void);
+void update_cameras(void);
+void clear_render_tasks(void);
+void clear_generic_entity_list(void);
+void clear_printers(void);
+void clear_item_entity_data(void);
+void clear_player_data(void);
 
 void enforce_hpfp_limits(void);
 

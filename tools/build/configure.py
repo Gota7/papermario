@@ -32,7 +32,7 @@ def exec_shell(command: List[str]) -> str:
     return ret.stdout
 
 def write_ninja_rules(ninja: ninja_syntax.Writer, cpp: str, cppflags: str, extra_cflags: str, use_ccache: bool,
-                      non_matching: bool):
+                      non_matching: bool, debug: bool):
     # platform-specific
     if sys.platform  == "darwin":
         iconv = "tools/iconv.py UTF-8 SHIFT-JIS"
@@ -78,9 +78,17 @@ def write_ninja_rules(ninja: ninja_syntax.Writer, cpp: str, cppflags: str, extra
         command=f"{cross}ld -T ver/$version/build/undefined_syms.txt -T ver/$version/undefined_syms_auto.txt -T ver/$version/undefined_funcs_auto.txt -Map $mapfile --no-check-sections -T $in -o $out",
     )
 
+    objcopy_sections = ""
+    if debug:
+        ninja.rule("genobjcopy",
+            description="generate $out",
+            command=f"$python {BUILD_TOOLS}/genobjcopy.py $in $out",
+        )
+        objcopy_sections = "@ver/$version/build/objcopy_sections.txt "
+
     ninja.rule("z64",
         description="rom $out",
-        command=f"{cross}objcopy $in $out -O binary && {BUILD_TOOLS}/rom/n64crc $out",
+        command=f"{cross}objcopy {objcopy_sections} $in $out -O binary && {BUILD_TOOLS}/rom/n64crc $out",
     )
 
     ninja.rule("sha1sum",
@@ -94,26 +102,26 @@ def write_ninja_rules(ninja: ninja_syntax.Writer, cpp: str, cppflags: str, extra
     )
 
     ninja.rule("cc",
-        description="cc $in",
+        description="gcc $in",
         command=f"bash -o pipefail -c '{cpp} {CPPFLAGS} {cppflags} -MD -MF $out.d $in -o - | {iconv} > $out.i && {ccache}{cc} {cflags} $cflags $out.i -o $out'",
         depfile="$out.d",
         deps="gcc",
     )
 
     ninja.rule("cc_dsl",
-        description="cc $in $cflags",
+        description="dsl $in",
         command=f"bash -o pipefail -c '{cpp} {CPPFLAGS} {cppflags} -MD -MF $out.d $in -o - | {compile_script} | {iconv} > $out.i && {cc} {cflags} $cflags $out.i -o $out'",
         depfile="$out.d",
         deps="gcc",
     )
 
     ninja.rule("cc_ido",
-        description="cc_ido $in",
+        description="ido $in",
         command=f"{ccache}{cc_ido} -w {CPPFLAGS_COMMON} {cppflags} -c -mips1 -O0 -G0 -non_shared -Xfullwarn -Xcpluscomm -o $out $in",
     )
 
     ninja.rule("cc_kmc",
-        description="cc_kmc $in",
+        description="kmc $in",
         command=f"bash -o pipefail -c 'N64ALIGN=ON VR4300MUL=ON {cc_kmc} {CPPFLAGS_LIBULTRA} {cppflags} {kmc_cflags} $cflags $in -o $out && mips-linux-gnu-objcopy -N $in $out'",
     )
 
@@ -227,7 +235,7 @@ class Configure:
         self.version_path = ROOT / f"ver/{version}"
         self.linker_entries = None
 
-    def split(self, assets: bool, code: bool):
+    def split(self, assets: bool, code: bool, debug: bool):
         import split
 
         modes = ["ld"]
@@ -237,18 +245,25 @@ class Configure:
         if code:
             modes.extend(["code", "c", "data", "rodata"])
 
+        splat_file = [str(self.version_path / "splat.yaml")]
+        if debug:
+            splat_file += [str(self.version_path / "splat-debug.yaml")]
+
         split.main(
-            str(self.version_path / "splat.yaml"),
+            splat_file,
             None,
             str(self.version_path / "baserom.z64"),
             modes,
-            verbose=False,
+            verbose=True,
         )
         self.linker_entries = split.linker_writer.entries[:]
         self.asset_stack = split.config["asset_stack"]
 
     def build_path(self) -> Path:
         return Path(f"ver/{self.version}/build")
+
+    def objcopy_sections_path(self) -> Path:
+        return self.build_path() / "objcopy_sections.txt"
 
     def undefined_syms_path(self) -> Path:
         return self.build_path() / "undefined_syms.txt"
@@ -296,7 +311,7 @@ class Configure:
         # ¯\_(ツ)_/¯
         return path
 
-    def write_ninja(self, ninja: ninja_syntax.Writer, skip_outputs: Set[str], non_matching: bool):
+    def write_ninja(self, ninja: ninja_syntax.Writer, skip_outputs: Set[str], non_matching: bool, debug: bool):
         import segtypes
         import segtypes.common.data
         import segtypes.n64.Yay0
@@ -373,7 +388,7 @@ class Configure:
                     task = "cxx"
                 with entry.src_paths[0].open() as f:
                     s = f.read()
-                    if "SCRIPT(" in s or "#pragma SCRIPT" in s or "#include \"world/common/foliage.inc.c\"" in s:
+                    if " SCRIPT(" in s or "#pragma SCRIPT" in s:
                         task = "cc_dsl"
 
                 if seg.name.endswith("osFlash"):
@@ -615,6 +630,14 @@ class Configure:
             else:
                 raise Exception(f"don't know how to build {seg.__class__.__name__} '{seg.name}'")
 
+        # Create objcopy section list
+        if debug:
+            ninja.build(
+                str(self.objcopy_sections_path()),
+                "genobjcopy",
+                str(self.build_path() / "elf_sections.txt"),
+            )
+
         # Run undefined_syms through cpp
         ninja.build(
             str(self.undefined_syms_path()),
@@ -623,11 +646,15 @@ class Configure:
         )
 
         # Build elf, z64, ok
+        additional_objects = [str(self.undefined_syms_path())]
+        if debug:
+            additional_objects += [str(self.objcopy_sections_path())]
+
         ninja.build(
             str(self.elf_path()),
             "ld",
             str(self.linker_script_path()),
-            implicit=[str(obj) for obj in built_objects] + [str(self.undefined_syms_path())],
+            implicit=[str(obj) for obj in built_objects] +  additional_objects,
             variables={ "version": self.version, "mapfile": str(self.map_path()) },
         )
         ninja.build(
@@ -635,6 +662,7 @@ class Configure:
             "z64",
             str(self.elf_path()),
             implicit=[CRC_TOOL],
+            variables={ "version": self.version },
         )
         ninja.build(
             str(self.rom_ok_path()),
@@ -731,14 +759,14 @@ if __name__ == "__main__":
         cflags += " -g1"
 
     if not args.no_warn:
-        cflags += "-Wuninitialized -Wmissing-braces -Wimplicit -Wredundant-decls -Wstrict-prototypes"
+        cflags += " -Wuninitialized -Wmissing-braces -Wimplicit -Wredundant-decls -Wstrict-prototypes"
 
     # add splat to python import path
     sys.path.append(str((ROOT / args.splat).resolve()))
 
     ninja = ninja_syntax.Writer(open(str(ROOT / "build.ninja"), "w"), width=9999)
 
-    write_ninja_rules(ninja, args.cpp or "cpp", cppflags, cflags, args.ccache, args.non_matching)
+    write_ninja_rules(ninja, args.cpp or "cpp", cppflags, cflags, args.ccache, args.non_matching, args.debug)
     write_ninja_for_tools(ninja)
 
     skip_files = set()
@@ -753,8 +781,8 @@ if __name__ == "__main__":
         if not first_configure:
             first_configure = configure
 
-        configure.split(not args.no_split_assets, args.split_code)
-        configure.write_ninja(ninja, skip_files, args.non_matching)
+        configure.split(not args.no_split_assets, args.split_code, args.debug)
+        configure.write_ninja(ninja, skip_files, args.non_matching, args.debug)
 
         all_rom_oks.append(str(configure.rom_ok_path()))
 
