@@ -181,7 +181,7 @@ segments:
     - [0x41D20, c, os/41d20_len_40]
     - [0x41D60, c, os/41d60_len_50]
     - [0x41DB0, c, os/osViGetCurrentFramebuffer, kmc -O3]
-    - [0x41DF0, c, os/41df0_len_40]
+    - [0x41DF0, c, os/osViGetNextFramebuffer, kmc -O3]
     - [0x41E30, c, os/41e30_len_40]
     - [0x41E70, c, os/41e70_len_340]
     - [0x421B0, c, os/421b0_len_60]
@@ -238,7 +238,7 @@ segments:
     - [0x47C60, c, os/47c60_len_f0] # MOVE_ADDU
     - [0x47D50, c, os/47d50_len_e0]
     - [0x47E30, c, os/47e30_len_60]
-    - [0x47E90, c, os/47e90_len_110]
+    - [0x47E90, c, os/osViInit, kmc -O3]
     - [0x47FA0, c, os/47fa0_len_20]
     - [0x47FC0, c, os/47fc0_len_60]
     - [0x48020, c, os/48020_len_a00]
