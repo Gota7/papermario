@@ -18,8 +18,8 @@ glabel func_800381EC
 /* 13618 80038218 3C01800A */  lui       $at, %hi(D_8009E9A0)
 /* 1361C 8003821C AC22E9A0 */  sw        $v0, %lo(D_8009E9A0)($at)
 /* 13620 80038220 24020001 */  addiu     $v0, $zero, 1
-/* 13624 80038224 3C01800A */  lui       $at, %hi(D_8009A5E4)
-/* 13628 80038228 A420A5E4 */  sh        $zero, %lo(D_8009A5E4)($at)
+/* 13624 80038224 3C01800A */  lui       $at, %hi(__osViIntrCount)
+/* 13628 80038228 A420A5E4 */  sh        $zero, %lo(__osViIntrCount)($at)
 /* 1362C 8003822C 3C01800A */  lui       $at, %hi(D_8009E9A4)
 /* 13630 80038230 A022E9A4 */  sb        $v0, %lo(D_8009E9A4)($at)
 /* 13634 80038234 03E00008 */  jr        $ra

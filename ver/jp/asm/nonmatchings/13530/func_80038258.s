@@ -36,8 +36,8 @@ glabel func_80038258
 /* 136C4 800382C4 00112080 */  sll       $a0, $s1, 2
 /* 136C8 800382C8 3C03800A */  lui       $v1, %hi(D_8009E9A0)
 /* 136CC 800382CC 8C63E9A0 */  lw        $v1, %lo(D_8009E9A0)($v1)
-/* 136D0 800382D0 3C05800A */  lui       $a1, %hi(D_8009A5E4)
-/* 136D4 800382D4 24A5A5E4 */  addiu     $a1, $a1, %lo(D_8009A5E4)
+/* 136D0 800382D0 3C05800A */  lui       $a1, %hi(__osViIntrCount)
+/* 136D4 800382D4 24A5A5E4 */  addiu     $a1, $a1, %lo(__osViIntrCount)
 /* 136D8 800382D8 00832021 */  addu      $a0, $a0, $v1
 /* 136DC 800382DC 94A30000 */  lhu       $v1, ($a1)
 /* 136E0 800382E0 0040802D */  daddu     $s0, $v0, $zero

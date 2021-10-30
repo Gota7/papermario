@@ -22,8 +22,8 @@ glabel func_800665E0
 /* 41A1C 8006661C 00000000 */   nop
 /* 41A20 80066620 0C019674 */  jal       func_800659D0
 /* 41A24 80066624 00408021 */   addu     $s0, $v0, $zero
-/* 41A28 80066628 3C01800A */  lui       $at, %hi(D_8009A60C)
-/* 41A2C 8006662C AC22A60C */  sw        $v0, %lo(D_8009A60C)($at)
+/* 41A28 80066628 3C01800A */  lui       $at, %hi(__osCurrentTime)
+/* 41A2C 8006662C AC22A60C */  sw        $v0, %lo(__osCurrentTime)($at)
 /* 41A30 80066630 00402821 */  addu      $a1, $v0, $zero
 /* 41A34 80066634 00002021 */  addu      $a0, $zero, $zero
 /* 41A38 80066638 0C01B198 */  jal       func_8006C660

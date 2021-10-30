@@ -18,16 +18,16 @@ glabel func_800664A4
 /* 418D4 800664D4 00000000 */   nop
 /* 418D8 800664D8 0C01B198 */  jal       func_8006C660
 /* 418DC 800664DC 00002021 */   addu     $a0, $zero, $zero
-/* 418E0 800664E0 3C01800A */  lui       $at, %hi(D_8009A60C)
+/* 418E0 800664E0 3C01800A */  lui       $at, %hi(__osCurrentTime)
 /* 418E4 800664E4 08019974 */  j         .L800665D0
-/* 418E8 800664E8 AC20A60C */   sw       $zero, %lo(D_8009A60C)($at)
+/* 418E8 800664E8 AC20A60C */   sw       $zero, %lo(__osCurrentTime)($at)
 .L800664EC:
 /* 418EC 800664EC 0C019674 */  jal       func_800659D0
 /* 418F0 800664F0 00000000 */   nop
-/* 418F4 800664F4 3C03800A */  lui       $v1, %hi(D_8009A60C)
-/* 418F8 800664F8 8C63A60C */  lw        $v1, %lo(D_8009A60C)($v1)
-/* 418FC 800664FC 3C01800A */  lui       $at, %hi(D_8009A60C)
-/* 41900 80066500 AC22A60C */  sw        $v0, %lo(D_8009A60C)($at)
+/* 418F4 800664F4 3C03800A */  lui       $v1, %hi(__osCurrentTime)
+/* 418F8 800664F8 8C63A60C */  lw        $v1, %lo(__osCurrentTime)($v1)
+/* 418FC 800664FC 3C01800A */  lui       $at, %hi(__osCurrentTime)
+/* 41900 80066500 AC22A60C */  sw        $v0, %lo(__osCurrentTime)($at)
 /* 41904 80066504 00431023 */  subu      $v0, $v0, $v1
 /* 41908 80066508 8E030010 */  lw        $v1, 0x10($s0)
 /* 4190C 8006650C 00403821 */  addu      $a3, $v0, $zero

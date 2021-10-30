@@ -5,7 +5,7 @@
 glabel D_80094670
 .word 0x800D9210, 0x00000000, 0x00000000, 0x00000000
 
-glabel D_80094680
+glabel __osViDevMgr
 .word 0x00000000
 
 glabel D_80094684

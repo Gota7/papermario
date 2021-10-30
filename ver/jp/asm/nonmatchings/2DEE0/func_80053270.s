@@ -20,8 +20,8 @@ glabel func_80053270
 /* 2E6AC 800532AC 00000000 */   nop
 .L800532B0:
 /* 2E6B0 800532B0 8E2200A4 */  lw        $v0, 0xa4($s1)
-/* 2E6B4 800532B4 3C01800A */  lui       $at, %hi(D_8009A5C8)
-/* 2E6B8 800532B8 AC22A5C8 */  sw        $v0, %lo(D_8009A5C8)($at)
+/* 2E6B4 800532B4 3C01800A */  lui       $at, %hi(__osBaseCounter)
+/* 2E6B8 800532B8 AC22A5C8 */  sw        $v0, %lo(__osBaseCounter)($at)
 /* 2E6BC 800532BC 10400003 */  beqz      $v0, .L800532CC
 /* 2E6C0 800532C0 00000000 */   nop
 /* 2E6C4 800532C4 0040F809 */  jalr      $v0
