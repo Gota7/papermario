@@ -162,10 +162,10 @@ segments:
     - [0x40E10, c, os/40E10]
     - [0x41050, c, os/osSpTaskYield]
     - [0x41070, c, os/osSpTaskYielded]
-    - [0x410C0, c, os/osSiRawStartDma]
+    - [0x410C0, c, os/osSiRawStartDma, kmc -O3]
     - [0x41170, c, os/41170_len_f0]
-    - [0x41260, c, os/osCreateThread]
-    - [0x41330, c, os/osGetThreadPri]
+    - [0x41260, c, os/osCreateThread, kmc -O3]
+    - [0x41330, c, os/osGetThreadPri, kmc -O3]
     - [0x41350, c, os/osSetThreadPri] # MOVE_ADDU
     - [0x41420, c, os/41420_len_120]
     - [0x41540, c, os/41540_len_c0]
